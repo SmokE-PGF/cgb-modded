@@ -42,7 +42,7 @@ Func _RemoteControl()
 					 $txtHelp &= '\n' & "BOT HELP - send this help message"
 					 $txtHelp &= '\n' & "BOT DELETE  - delete all your previous Push message"
 					 $txtHelp &= '\n' & "BOT <Village Name> RESTART - restart the bot named <Village Name> and bluestacks"
-					 ;$txtHelp &= '\n' & "BOT <Village Name> STOP - stop the bot named <Village Name>"
+					 $txtHelp &= '\n' & "BOT <Village Name> STOP - stop the bot named <Village Name>"
 					 $txtHelp &= '\n' & "BOT <Village Name> PAUSE - pause the bot named <Village Name>"
 					 $txtHelp &= '\n' & "BOT <Village Name> RESUME   - resume the bot named <Village Name>"
 					 $txtHelp &= '\n' & "BOT <Village Name> STATS - send Village Statistics of <Village Name>"
@@ -127,15 +127,15 @@ Func _RemoteControl()
 				  _Push($iOrigPushB & ": Request to Restart...", "Your bot and BS are now restarting...")
 				  SaveConfig()
 				  _Restart()
-			;Case "BOT " & StringUpper($iOrigPushB)  & " STOP"
-			;	  _DeleteMessage($iden[$x])
-			;	  SetLog("Your request has been received. " & $title[$x])
-			;	  If $Runstate = True Then
-			;		 _Push($iOrigPushB & ": Request to Stop...", "Your bot is now stopping...")
-			;		 btnStop()
-			;	  Else
-			;		 _Push($iOrigPushB & ": Request to Stop...", "Your bot is currently stopped, no action was taken")
-			;	  EndIf
+			Case "BOT " & StringUpper($iOrigPushB)  & " STOP"
+				  _DeleteMessage($iden[$x])
+				  SetLog("Your request has been received. " & $title[$x])
+				  If $Runstate = True Then
+					 _Push($iOrigPushB & ": Request to Stop...", "Your bot is now stopping...")
+					 btnStop()
+				  Else
+					 _Push($iOrigPushB & ": Request to Stop...", "Your bot is currently stopped, no action was taken")
+				  EndIf
 			EndSwitch
 				$title[$x] = ""
 				$iden[$x] = ""
@@ -183,7 +183,7 @@ Func _PushFile($File, $Folder, $FileType, $title, $body)
 	  Local $pPush = '{"file_name": "' & $File & '", "file_type": "' & $FileType & '"}'
 	  $oHTTP.Send($pPush)
 	  $Result = $oHTTP.ResponseText
-	  ;SetLog("risposta: " & $Result , $COLOR_RED)
+
 	  Local $upload_url = _StringBetween($Result, 'upload_url":"', '"')
 	  Local $awsaccesskeyid = _StringBetween($Result, 'awsaccesskeyid":"', '"')
 	  Local $acl = _StringBetween($Result, 'acl":"', '"')
@@ -211,18 +211,8 @@ Func _PushFile($File, $Folder, $FileType, $title, $body)
 EndFunc   ;==>_PushFile
 
 Func ReportPushBullet()
-	If $iLastAttack = 1 Then
-		If $lootGold <> "" Or $lootElixir <> "" Then
-			_PushBullet($iOrigPushB & ": Last Gain", " [G]: " &  _NumberFormat($lootGold) & " [E]: " &  _NumberFormat($lootElixir) & " [D]: " &  _NumberFormat($lootDarkElixir) & "  [T]: " & _NumberFormat($lootTrophies))
-		EndIf
-	EndIf
-
-	If $iAlertPBVillage = 1 Then
-		_PushBullet($iOrigPushB & ": My Village", " [G]: " &  _NumberFormat($GoldCount) & " [E]: " &  _NumberFormat($ElixirCount) & " [D]: " &  _NumberFormat($DarkCount) & "  [T]: " &  _NumberFormat($TrophyCount) & " [FB]: " &  _NumberFormat($FreeBuilder))
-	EndIf
-
+	PushMsg("MyVillage")
 EndFunc   ;==>ReportPushBullet
-
 
 Func _DeletePush()
 	$oHTTP = ObjCreate("WinHTTP.WinHTTPRequest.5.1")
@@ -263,6 +253,10 @@ Func PushMsg($Message, $Source = "")
 				    ;If not($iDelete) Then SetLog("An error occurred deleting the file." )
 					;_DeleteMessage($iden[$x])
 	  EndIf
+	Case "LastRaidTxt"
+		If $pEnabled = 1 And $pLastRaidTxt = 1 Then _Push($iOrigPushB & ": Last Raid", " [G]: " &  _NumberFormat($lootGold) & " [E]: " &  _NumberFormat($lootElixir) & " [D]: " &  _NumberFormat($lootDarkElixir) & "  [T]: " & _NumberFormat($lootTrophies))
+	Case "MyVillage"
+		If $pEnabled = 1 AND $iAlertPBVillage = 1 Then _Push($iOrigPushB & ": My Village", " [G]: " &  _NumberFormat($GoldCount) & " [E]: " &  _NumberFormat($ElixirCount) & " [D]: " &  _NumberFormat($DarkCount) & "  [T]: " &  _NumberFormat($TrophyCount) & " [FB]: " &  _NumberFormat($FreeBuilder))
 	Case "FoundWalls"
 		If $pEnabled = 1 AND $pWallUpgrade = 1 Then _Push($iOrigPushB & ": Found Wall level " & $icmbWalls+4 , " Wall segment has been located...\nUpgrading ...")
 	Case "SkypWalls"

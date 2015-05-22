@@ -21,8 +21,10 @@ Func GetResources() ;Reads resources
 			$Is_ClientSyncError = True
 			GUICtrlSetData($lblresultoutofsync, GUICtrlRead($lblresultoutofsync)+ 1)
 			$iStuck = 0
+			If $isSnipeWhileTrain Then ; When OoS occured during Snipe While Train MOD no need to go to search
+			   TurnOffSnipeWhileTrain()
+			EndIf
 			checkMainScreen()
-			$Restart = True
 			Return
 		EndIf
 	WEnd
@@ -41,8 +43,10 @@ Func GetResources() ;Reads resources
 		$Is_ClientSyncError = True
 		GUICtrlSetData($lblresultoutofsync, GUICtrlRead($lblresultoutofsync)+ 1)
 		$iStuck = 0
+		If $isSnipeWhileTrain Then ; When OoS occured during Snipe While Train MOD no need to go to search
+		  TurnOffSnipeWhileTrain()
+		EndIf
 		checkMainScreen()
-		$Restart = True
 		Return
 	EndIf
 

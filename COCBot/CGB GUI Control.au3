@@ -65,6 +65,8 @@ Func GUIControl($hWind, $iMsg, $wParam, $lParam)
 					If $RunState Then btnAttackNow()
 				Case $btnDonate
 					ShellExecute("https://gamebot.org/forums/misc.php?action=mydonations")
+				Case $btnResetStats
+					btnResetStats()
 			EndSwitch
 
 		Case 274
@@ -80,10 +82,14 @@ Func GUIControl($hWind, $iMsg, $wParam, $lParam)
 	Return $GUI_RUNDEFMSG
 EndFunc   ;==>GUIControl
 
+Func PushBulletRemoteControl()
+    If GUICtrlRead($chkPBenabled) = $GUI_CHECKED AND GUICtrlRead($chkPBRemote) = $GUI_CHECKED Then _RemoteControl()
+EndFunc   ;==>PushBulletRemoteControl
+
 Func SetTime()
 	Local $time = _TicksToTime(Int(TimerDiff($sTimer) + $iTimePassed), $hour, $min, $sec)
 	If _GUICtrlTab_GetCurSel($tabMain) = 9 Then GUICtrlSetData($lblresultruntime, StringFormat("%02i:%02i:%02i", $hour, $min, $sec))
-    If $pEnabled = 1 AND $pRemote = 1 AND (StringFormat("%02i", $sec) = "00" OR StringFormat("%02i", $sec) = "30") Then _RemoteControl()
+    ;If $pEnabled = 1 AND $pRemote = 1 AND (StringFormat("%02i", $sec) = "00" OR StringFormat("%02i", $sec) = "30") Then _RemoteControl()
 EndFunc   ;==>SetTime
 Func Initiate()
 
@@ -414,6 +420,39 @@ Func btnHide()
    EndIf
 EndFunc   ;==>btnHide
 
+Func btnResetStats()
+	GUICtrlSetState($btnResetStats, $GUI_DISABLE)
+	$FirstRun = 1
+	$FirstAttack = 0
+	GUICtrlSetState($lblLastAttackTemp, $GUI_SHOW)
+	GUICtrlSetState($lblTotalLootTemp, $GUI_SHOW)
+	GUICtrlSetState($lblHourlyStatsTemp, $GUI_SHOW) ;; added for hourly stats
+	GUICtrlSetData($lblresultruntime, "00:00:00")
+	GUICtrlSetData($lblWallgoldmake, "0")
+	$wallgoldmake = 0
+	GUICtrlSetData($lblWallelixirmake, "0")
+	$wallelixirmake = 0
+	GUICtrlSetData($lblresultoutofsync, "0")
+	GUICtrlSetData($lblresulttrophiesdropped, "0")
+	GUICtrlSetData($lblresultvillagesskipped, "0")
+	GUICtrlSetData($lblresultvillagesattacked, "0")
+	GUICtrlSetData($lblGoldLastAttack, "")
+	GUICtrlSetData($lblElixirLastAttack, "")
+	GUICtrlSetData($lblDarkLastAttack, "")
+	GUICtrlSetData($lblTrophyLastAttack, "")
+	GUICtrlSetData($lblGoldLoot, "")
+	GUICtrlSetData($lblElixirLoot, "")
+	GUICtrlSetData($lblDarkLoot, "")
+	GUICtrlSetData($lblTrophyLoot, "")
+	GUICtrlSetData($lblHourlyStatsGold, "")
+	GUICtrlSetData($lblHourlyStatsElixir, "")
+	GUICtrlSetData($lblHourlyStatsDark, "")
+	GUICtrlSetData($lblHourlyStatsTrophy, "")
+	$iTimePassed = 0
+	$sTimer = TimerInit()
+	UpdateStats()
+EndFunc   ;==>btnResetStats
+
 Func chkDeployRedArea()
 	If GUICtrlRead($chkDeployRedArea) = $GUI_CHECKED Then
 		$chkRedArea = 1
@@ -457,10 +496,6 @@ Func SetComboTroopComp()
 				GUICtrlSetState(Eval("txtNum" & $TroopDarkName[$i]), $GUI_ENABLE)
 			Next
 
-			GUICtrlSetData($txtNumBarb, "0")
-			GUICtrlSetData($txtNumArch, "100")
-			GUICtrlSetData($txtNumGobl, "0")
-
 			For $i = 0 To UBound($TroopName) - 1
 				_GUICtrlEdit_SetReadOnly(Eval("txtNum" & $TroopName[$i]), True)
 			Next
@@ -474,6 +509,7 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
+			GUICtrlSetData($txtNumArch, "100")
 		Case 1
 			GUICtrlSetState($cmbBarrack1, $GUI_DISABLE)
 			GUICtrlSetState($cmbBarrack2, $GUI_DISABLE)
@@ -1526,12 +1562,11 @@ Func sldVSDelay()
 		GUICtrlSetState($chkAlertPBVMFound, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBLastRaid, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBWallUpgrade, $GUI_ENABLE)
-		;GUICtrlSetState($chkAlertPBLastRaidTxt, $GUI_ENABLE)
+		GUICtrlSetState($chkAlertPBLastRaidTxt, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBOOS, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBLab, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBVBreak, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBVillage, $GUI_ENABLE)
-		GUICtrlSetState($chkAlertPBLastAttack, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertPBOtherDevice, $GUI_ENABLE)
 		GUICtrlSetState($chkDeleteAllPushes, $GUI_ENABLE)
 	 Else
@@ -1541,12 +1576,11 @@ Func sldVSDelay()
 		GUICtrlSetState($chkAlertPBVMFound, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBLastRaid, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBWallUpgrade, $GUI_DISABLE)
-		;GUICtrlSetState($chkAlertPBLastRaidTxt, $GUI_DISABLE)
+		GUICtrlSetState($chkAlertPBLastRaidTxt, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBOOS, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBLab, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBVBreak, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBVillage, $GUI_DISABLE)
-		GUICtrlSetState($chkAlertPBLastAttack, $GUI_DISABLE)
 		GUICtrlSetState($chkAlertPBOtherDevice, $GUI_DISABLE)
 		GUICtrlSetState($chkDeleteAllPushes, $GUI_DISABLE)
 	EndIf

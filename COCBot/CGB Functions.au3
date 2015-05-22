@@ -28,6 +28,7 @@
 #include "functions\Attack\ReturnHome.au3"
 #include "functions\Attack\SetSleep.au3"
 #include "functions\Attack\Unbreakable.au3"
+#include "functions\Attack\SnipeWhileTrain.au3"
 #include "functions\Attack\Attack Algorithms\algorithm_AllTroops.au3"
 #include "functions\Attack\Attack Algorithms\algorithm_Barch.au3"
 #include "functions\Attack\Attack Algorithms\algorithmTH.au3"
@@ -85,6 +86,7 @@
 #include "functions\Other\TogglePause.au3"
 #include "functions\Other\CheckPrerequisites.au3"
 #include "functions\Other\AutoStart.au3"
+#include "functions\Other\UpdateStats.au3"
 
 #include "functions\Pixels\_CaptureRegion.au3"
 #include "functions\Pixels\_ColorCheck.au3"

@@ -19,6 +19,7 @@
 $frmBot = GUICreate($sBotTitle, 470, 715)
 	GUISetIcon($LibDir & "\CGBBOT.dll", 10)
 	TraySetIcon($LibDir & "\CGBBOT.dll", 10)
+	GUISetFont(8.5,400,0,"Tahoma")
 $tabMain = GUICtrlCreateTab(5, 85, 461, 495, $TCS_TOOLTIPS)
 	GUICtrlSetOnEvent(-1, "tabMain")
 	GUICtrlCreatePic (@ScriptDir & "\Icons\logo.jpg", 0, 0, 470, 80)
@@ -545,6 +546,8 @@ GUICtrlCreateTabItem("")
 		$y +=22
 		$chkAttackTH = GUICtrlCreateCheckbox("Attack Townhall Outside", $x, $y, -1, -1)
 			GUICtrlSetTip(-1, "Check this to Attack an exposed Townhall first. (Townhall outside of Walls)" & @CRLF & "TIP: Also tick 'Meet Townhall Outside' on the Search tab if you only want to search for bases with exposed Townhalls.")
+	    $chkSnipeWhileTrain = GUICtrlCreateCheckbox("TH snipe while training army", $x + 200, $y, -1, -1) ; Snipe While Train MOD by ChiefM3
+			GUICtrlSetTip(-1, "Bot will try to TH snipe while training army.")
 		$y +=22
 		$chkLightSpell = GUICtrlCreateCheckbox("Hit Dark Elixir storage with Lightning Spell", $x, $y, -1, -1)
 			GUICtrlSetTip(-1, "Check this if you want to use lightning spells to steal Dark Elixir when bot meet Minimum Dark Elixir.")
@@ -828,7 +831,7 @@ $y += 40
 		GUICtrlSetImage (-1, $LibDir & "\CGBBOT.dll", 35, 1)
 		GUICtrlSetOnEvent(-1, "btnDonateLavaHounds")
 		;GUICtrlSetState (-1, $GUI_DISABLE)
-		
+
 	;;; Custom Combination Donate by ChiefM3
 	$lblBtnCustom = GUICtrlCreateLabel("", $x + 263, $y - 2, 42, 42)
 		GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -1332,7 +1335,7 @@ $y += 75
 			GUICtrlSetData(-1, StringFormat("no\r\ncw\r\nwar"))
 			GUICtrlSetTip(-1, "Blacklist for donating Custom Troops")
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	
+
 	$grpBlacklist = GUICtrlCreateGroup("General Blacklist", $x - 20, $y - 20, 450, 190)
 		GUICtrlSetState(-1, $GUI_HIDE)
 		$picDonateBlacklist = GUICtrlCreateIcon ($LibDir & "\CGBBOT.dll", 63, $x + 215, $y, 64, 64, $BS_ICON)
@@ -1621,7 +1624,7 @@ $tabMisc = GUICtrlCreateTabItem("Misc")
 			$txtTip = "Attack a Deadbase found on the first search while dropping Trophies."
 			GUICtrlSetTip(-1, $txtTip)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	
+
 	Local $x = 260, $y = 275
 	$grpLocateBuildings = GUICtrlCreateGroup("Locate Manually", $x - 20, $y - 20, 220, 65)
 		$btnLocateTownHall = GUICtrlCreateButton("Townhall", $x - 10, $y, 40, 40, $BS_ICON)
@@ -1703,7 +1706,7 @@ Local $x = 30, $y = 125
 			GUICtrlSetLimit(-1, 7)
 			GUICtrlSetState(-1, $GUI_DISABLE)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	
+
 	$y += 115
 	$grpUpgrades = GUICtrlCreateGroup("Upgrades Queue", $x - 20, $y - 20, 220, 110)
 	$chkUpgrade1 = GUICtrlCreateCheckbox("Upgrade 1", $x-10, $y - 3, -1, 20)
@@ -1760,7 +1763,7 @@ Local $x = 30, $y = 125
 		$txtBuilderKeepFree = GUICtrlCreateInput("0", $x + 100, $y + 57, 61, 21, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			GUICtrlSetTip(-1, "Keep free builders to build walls or otherwise.")
 			GUICtrlSetLimit(-1, 1)
-		
+
 		$x -= 230
 		$y += 105
 		$Laboratory = GUICtrlCreateGroup("Laboratory", $x - 20, $y - 20, 500, 70)
@@ -1891,7 +1894,7 @@ Local $x = 30, $y = 125
 		GUICtrlSetImage (-1, $LibDir & "\CGBBOT.dll", 35, 1)
 		GUICtrlSetOnEvent(-1, "btnTroopsLavaHounds")
 		;GUICtrlSetState (-1, $GUI_DISABLE)
-	
+
 		$x += 2
 		$y += 70
         $grpLocateBuildings = GUICtrlCreateGroup("Locate Heroes", $x - 20, $y - 20, 220, 65)
@@ -1942,8 +1945,8 @@ $tabNotify = GUICtrlCreateTabItem("Notify")
 		 GUICtrlSetTip(-1, "It will altert you about wall upgrade whether fail or successful")
 		 GUICtrlSetState(-1, $GUI_DISABLE)
 	  $chkAlertPBLastRaidTxt = GUICtrlCreateCheckbox("Last raid as Text", $x + 250, $y + 75, -1, -1)
-		 GUICtrlSetState(-1, $GUI_DISABLE)
 		 GUICtrlSetTip(-1, "Last raid result will be sent as text")
+		 GUICtrlSetState(-1, $GUI_DISABLE)
 	  $chkAlertPBOOS = GUICtrlCreateCheckbox("Error: Out Of Sync", $x + 130, $y + 100, -1, -1)
 		 GUICtrlSetTip(-1, "It will alert you when Error: Server out of sync")
 		 GUICtrlSetState(-1, $GUI_DISABLE)
@@ -1953,20 +1956,18 @@ $tabNotify = GUICtrlCreateTabItem("Notify")
 
 	  $chkAlertPBVillage = GUICtrlCreateCheckbox("Alert My Village", $x + 25, $y + 125, -1, -1)
 		 GUICtrlSetState(-1, $GUI_DISABLE)
-	  $chkAlertPBLastAttack = GUICtrlCreateCheckbox("Alert Last Attack", $x + 130, $y + 125, -1, -1)
+	  $chkDeleteAllPushes = GUICtrlCreateCheckbox("Delete all Pushes", $x + 130, $y + 125, -1, -1)
+		 GUICtrlSetTip(-1, "It will delete all previous push notification when you start bot")
 		 GUICtrlSetState(-1, $GUI_DISABLE)
 	  $chkAlertPBOtherDevice = GUICtrlCreateCheckbox("Another device has connected", $x + 250, $y + 125, -1, -1)
 		 GUICtrlSetTip(-1, "It will notify you when your village is connected from another device")
 		 GUICtrlSetState(-1, $GUI_DISABLE)
-	  $chkDeleteAllPushes = GUICtrlCreateCheckbox("Delete all Pushes", $x + 25, $y + 150, -1, -1)
-		 GUICtrlSetTip(-1, "It will delete all previous push notification when you start bot")
-		 GUICtrlSetState(-1, $GUI_DISABLE)
-	  $chkAlertPBLab = GUICtrlCreateCheckbox("Laboratory Upgrades", $x + 130, $y + 150, -1, -1)
+	  $chkAlertPBLab = GUICtrlCreateCheckbox("Laboratory Upgrades", $x + 25, $y + 150, -1, -1)
 		 GUICtrlSetTip(-1, "It will alert you when the unit you selected starts upgrading, or you do not have enough resources to upgrade")
 		 GUICtrlSetState(-1, $GUI_DISABLE)
 
 	  $lblgrppushbullet = GUICtrlCreateGroup("PushBullet Remote Control", $x-10, $y + 180, 430, 215)
-	  $lblPBdesc = GUICtrlCreateLabel("You can remotely control your bot sending commands following this syntax:" & @CRLF & @CRLF & "BOT HELP - send this help message" & @CRLF & "BOT DELETE  - delete all your previous Push message" & @CRLF & "BOT <Village Name> PAUSE - pause the bot named <Village Name>" & @CRLF & "BOT <Village Name> RESTART - restart the bot named <Village Name> and BlueStacks" & @CRLF & "BOT <Village Name> RESUME   - resume the bot named <Village Name>" & @CRLF & "BOT <Village Name> STATS - send Village Statistics of <Village Name>" & @CRLF & "BOT <Village Name> LOG - send the current log file of <Village Name>" & @CRLF & "BOT <Village Name> LASTRAID - send the current log file of <Village Name>" & @CRLF & "BOT <Village Name> SCREENSHOT - send a screenshot of <Village Name>"  & @CRLF &   @CRLF & "Examples:" & @CRLF & "Bot MyVillage Pause    -    Bot Delete    -    Bot MyVillage Screenshot", $x, $y + 195, -1, -1, $SS_LEFT)
+	  $lblPBdesc = GUICtrlCreateLabel("You can remotely control your bot sending commands following this syntax:" & @CRLF & @CRLF & "BOT HELP - send this help message" & @CRLF & "BOT DELETE  - delete all your previous Push message" & @CRLF & "BOT <Village Name> PAUSE - pause the bot named <Village Name>" & @CRLF & "BOT <Village Name> RESTART - restart the bot named <Village Name> and BlueStacks" & @CRLF & "BOT <Village Name> STOP - stop the bot named <Village Name>" & @CRLF & "BOT <Village Name> RESUME - resume the bot named <Village Name>" & @CRLF & "BOT <Village Name> STATS - send Village Statistics of <Village Name>" & @CRLF & "BOT <Village Name> LOG - send the current log file of <Village Name>" & @CRLF & "BOT <Village Name> LASTRAID - send the current log file of <Village Name>" & @CRLF & "BOT <Village Name> SCREENSHOT - send a screenshot of <Village Name>"  & @CRLF &   @CRLF & "Examples:" & @CRLF & "Bot MyVillage Pause    -    Bot Delete    -    Bot MyVillage Screenshot", $x, $y + 195, -1, -1, $SS_LEFT)
 
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 GUICtrlCreateTabItem("")
@@ -2030,7 +2031,7 @@ Local $x = 30, $y = 130
 			$txtTip = "The amount of Trophies you gained or lost on the last attack."
 			GUICtrlSetTip(-1, $txtTip)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	
+
 	$x += 113
 	$y = 130
     $grpTotalLoot = GUICtrlCreateGroup("Stats: Total Loot", $x - 20, $y - 20, 108, 105)
@@ -2081,8 +2082,13 @@ Local $x = 30, $y = 130
 			GUICtrlSetTip(-1, $txtTip)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-	$x = 330
+	$x = 265
 	$y = 235
+	$btnResetStats = GUICtrlCreateButton ("Reset Stats", $x, $y, 60,21)
+		GUICtrlSetOnEvent(-1, "btnResetStats")
+		GUICtrlSetTip(-1, "Reset statistics without closing the bot")
+		GUICtrlSetState(-1, $GUI_DISABLE)
+	$x +=65
 	$btnMoreStats = GUICtrlCreateButton ("More Stats", $x, $y, 60,21)
 		GUICtrlSetState(-1, $GUI_DISABLE)
 	$x +=65

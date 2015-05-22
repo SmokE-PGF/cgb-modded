@@ -2,6 +2,7 @@
 
 Func VillageSearch() ;Control for searching a village that meets conditions
 	$iSkipped = 0
+	$haltSearch = False ; to halt searches after 10 attempts ; Snipe While Train Mod by ChiefM3
 
 	If $Is_ClientSyncError = False Then
 		$AimGold = $MinGold
@@ -100,7 +101,6 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		EndIf
 
 		GetResources() ;Reads Resource Values
-		If $Restart = True Then Return ; exit func
 		If $iChkAttackNow = 1 Then
 			If _Sleep(1000 * $iAttackNowDelay) Then Return ; add human reaction time on AttackNow button function
 		EndIf
@@ -170,6 +170,12 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 				SetLog(_PadStringCenter(" TH Outside Found! ", 50, "~"), $COLOR_GREEN)
 				ExitLoop
 			Else
+			   ; break every 10 searches when Snipe While Train MOD is activated
+			   If $isSnipeWhileTrain And $iSkipped > 8 Then
+				  Click(62, 519) ; Click End Battle to return home
+				  $haltSearch = True ; To Prevent Initiation of Attack
+				  ExitLoop
+			   EndIf
 				;If _Sleep(1000) Then Return
 				If $bBtnAttackNowPressed = True Then ExitLoop
 				Click(750, 500) ;Click Next
